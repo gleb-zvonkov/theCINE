@@ -1,0 +1,53 @@
+.result-grid{   /* The grid that contains all the movies */
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(600px, 1fr));
+    /* grid will automatically adjust the number of columns based on the available width
+     a minimum column width of 200px 
+     each column taking up an equal fraction of the available space (1fr) */
+     gap: 15px;  /*Put a gap between each search item*/
+}
+
+.movie-item-container{   /*A container for each movie*/
+    position: relative;  /*part of the normal document flow*/
+}
+
+.movie-item {   /*The movie item that contains the image and video*/
+    width: 100%; /*width is 100% of the container*/
+    height: 100%; 
+    transition: transform 1s ease;  /*make the scale transformation 1 sec*/
+}
+
+.backdrop_image{  /*The backdrop image for the movie*/
+    width: 100%; /* Make the image the full width of the search item div container */
+    height: auto; /* Maintain the image's aspect ratio */
+    border-radius: 30px;   /*Because border does not apply to child element we cant set it in the movie item*/
+    filter: contrast(1.1) brightness(0.9);
+}
+
+.title {
+    position: absolute;
+    bottom: -10px; /* Adjust as needed */
+    left: 15px; /* Adjust as needed */
+    color: white;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+}
+
+
+.hover-video {  /*The video for each movie*/
+    width: 100%;  /* Match the width of the parent .search-item */
+    height: 100%; /* Match the height of the parent .search-item */
+    border-radius: 30px; /*Because border does not apply to child element we cant set it in the movie item*/
+    position: absolute; /* Position the video inside the .search-item */
+    top: 0;    /*distance between the top edge absolute position*/
+    left: 0;   /*distance between the left edge absolute position*/
+    opacity: 0;  /*set the opacity to 0, so the video does not appear*/
+    transition: opacity 2s ease;  /*set the opacity transition to 2 seconds*/
+}
+
+.movie-item:hover .hover-video{      /*apply styles to the hoover video when the movie item is hovered over*/  
+    opacity: 1;   /*when the search item is hovered over set the videos opacity to 1 so its visible */
+}
+
+.movie-item:hover{   /* */
+    transform: scale(1.05);  /*when the search item is hover over scale its size up*/
+}
