@@ -1,3 +1,7 @@
+# this api call could be useful to get the more movies for the starting page  
+# https://developer.themoviedb.org/reference/movie-now-playing-list 
+
+
 import requests
 from bs4 import BeautifulSoup
 import re
@@ -97,15 +101,11 @@ def get_random_strings(string_array, num_strings):
     return random_strings
 
 
+
+
+# we use global variables here because we want to find all the movies once, and then just select some number of them 
 top_rated_movies_info = []
 popular_movies_info = []
-
-movies = [
-    "The Shawshank Redemption",
-    "The Godfather",
-    "The Dark Knight",
-    "Pulp Fiction",
-]
 
 def all_movies_info():    #2 minutes
     global top_rated_movies_info 
@@ -113,39 +113,25 @@ def all_movies_info():    #2 minutes
     top_rated_movies = common_strings(get_top_rated_movie_names(),scrape_imdb_top())    # get the movies common to the top rated movies from tmdb and imdb 
     popular_movies = common_strings(get_trending_movie_names(),scrape_imdb_popular())   # get the movies common to the top trending movies from tmdb and popular movies from imdb 
     top_rated_movies = exclude_common_elements(top_rated_movies, popular_movies);   # exlude anything that is in top rated movies and popular movies
-    #top_rated_movies = movies
-   # popular_movies = movies
     top_rated_movies_info = json.loads(getMoviesUsingTitles(top_rated_movies))
     popular_movies_info = json.loads(getMoviesUsingTitles(popular_movies))
 
+
+# def all_movies_info():
+#     global top_rated_movies_info 
+#     global popular_movies_info 
+#     top_rated_movies_info = json.loads(getMoviesUsingTitles(["Modern Times", "The Thing"]))
+#     popular_movies_info = json.loads(getMoviesUsingTitles(["Barbie", "Oppenheimer", "The Iron Claw", "The Boys In The Boat"]))
 
 
 def get_star_page_movies_info():
     global top_rated_movies_info 
     global popular_movies_info 
-
-    top_movies = random.sample(top_rated_movies_info, 2)
-    popular_movies = random.sample(popular_movies_info, 10)
+    top_movies = random.sample(top_rated_movies_info, 4)
+    popular_movies = random.sample(popular_movies_info, 8)
     all_movies = top_movies + popular_movies
-
     random.shuffle(all_movies)
+    return all_movies
 
-    json_result = json.dumps(all_movies)
-
-    return json_result
-
-# import timeit
-
-#start_page_movie_names_pool() 
-
-# get all the necessary info first for the entire pool of movies
-
-# elapsed_time = timeit.timeit( all_movies_info, number=1)   # 50 seconds
-# print(f"My function 1 took {elapsed_time} seconds to run.")   
- 
-
-# elapsed_time = timeit.timeit(get_star_page_movies_info, number=1)   # 10 sedonds
-# print(f"My function 2 took {elapsed_time} seconds to run.")
 
 all_movies_info()
-#get_star_page_movies_info()

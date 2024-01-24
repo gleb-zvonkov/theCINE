@@ -9,7 +9,7 @@ def fetchMovieById(tmdbId):
         "Authorization": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIzZDIwYzY4ZDMxNmRkMjM0NGVkOWI5ZjRmNDNkMzIyYiIsInN1YiI6IjY1MDc1ODFhM2NkMTJjMDE0ZWJmN2U2YiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.URBinN5yI5YymjjRmdSmr4nEHXkQfsMFqToTyv9QTt0"
     }
     response = requests.get(url, headers=headers)
-    return response.text   # this is a json 
+    return response.json()   # this is a json 
 
 def searchMovieByTitle(movieName):
     url = f"https://api.themoviedb.org/3/search/movie?query={movieName}&include_adult=false&language=en-US&page=1"
@@ -51,7 +51,7 @@ def getMovieCrewById(tmdbId):
         "Authorization": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIzZDIwYzY4ZDMxNmRkMjM0NGVkOWI5ZjRmNDNkMzIyYiIsInN1YiI6IjY1MDc1ODFhM2NkMTJjMDE0ZWJmN2U2YiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.URBinN5yI5YymjjRmdSmr4nEHXkQfsMFqToTyv9QTt0"
     }
     response = requests.get(url, headers=headers)
-    return response 
+    return response.json() 
 
 # Get the top trending movies from tmdb
 def fetch_trending_movies(page=1):

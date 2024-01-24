@@ -1,30 +1,20 @@
 import csv
 import requests
 import json
+from tmdbFetchFunctions import fetchMovieById, getMovieCrewById 
 
 #this function adds a movie to the CSV
 #it fetches movie data and crew data
 #rearanges it into the proper format 
 #writes it to a csv
-csv_file_path = 'movieRecommendationServer/45000_movies/movies_metadata_final_added.csv'
+csv_file_path = '45000_movies/movies_metadata_final_added.csv'
 tmdb_ids_in_csv = set() #built-in data type that represents an unordered collection of unique elements
 
 
-
-def addMovieToCSV(tmdbId):
-
-    headers = {
-        "accept": "application/json",
-        "Authorization": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIzZDIwYzY4ZDMxNmRkMjM0NGVkOWI5ZjRmNDNkMzIyYiIsInN1YiI6IjY1MDc1ODFhM2NkMTJjMDE0ZWJmN2U2YiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.URBinN5yI5YymjjRmdSmr4nEHXkQfsMFqToTyv9QTt0"
-    }
-    
-    url = f"https://api.themoviedb.org/3/movie/{tmdbId}?language=en-US"   #get movie information
-    response = requests.get(url, headers=headers)    
-    movie_data = response.json()    
-
-    url = f"https://api.themoviedb.org/3/movie/{tmdbId}/credits?language=en-US"  #get movie crew information 
-    response2 = requests.get(url, headers=headers)
-    crew_data = response2.json()
+# collect all the information to be added to the csv
+def getMovieInfoForCSV(tmdbId):
+    movie_data = fetchMovieById(tmdbId)
+    crew_data = getMovieCrewById(tmdbId)
     
     genres = [genre['name'] for genre in movie_data.get('genres', [])] # get the genres 
     popularity = movie_data.get('popularity')    # get the popularity score
@@ -41,8 +31,13 @@ def addMovieToCSV(tmdbId):
     sorted_cast = sorted(cast_list, key=lambda x: x.get("order", 0))  # sort the cast list based on the 'order' key
     top_3_actor_names = [actor['name'] for actor in sorted_cast[:3]]  # get the top 3 actors
     
-    new_data = [genres, tmdbId, popularity, release_date, title, vote_average, vote_count, director_name, top_3_actor_names]   # put it all together 
+    return [genres, tmdbId, popularity, release_date, title, vote_average, vote_count, director_name, top_3_actor_names]   # put it all together 
 
+
+# add new movie to csv 
+# does not check if it already exists
+def addMovieToCSV(tmdbId):
+    new_data = getMovieInfoForCSV(tmdbId) 
     with open(csv_file_path, 'a', newline='') as file:   # open the csv
         csv_writer = csv.writer(file)  #csv writer object 
         csv_writer.writerow(new_data)  #write the data
@@ -63,6 +58,7 @@ def findMoviesInCSV():
         pass  # If the file doesn't exist, no need to check tmdbIds
 
 
+# checks if id already exist 
 def addMoviesToCSV(tmdbIds):  
     global tmdb_ids_in_csv
     tmdb_ids_to_add = [Id for Id in tmdbIds if Id not in tmdb_ids_in_csv]   # the tmdb ids not already in the csv 

@@ -22,7 +22,7 @@ const port = 3000;  //the port number for server
 app.use(express.json());  //parse incroming json request
 app.use(
   cors({
-    origin: "http://127.0.0.1:5501",   // allow requests from this origin 
+    origin: ["http://127.0.0.1:5501", "https://coralwindow.ca", "http://35.226.51.35:8000"],   // allow requests from this origin     // allow requests from this origin 
   })
 )
 
