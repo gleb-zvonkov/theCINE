@@ -1,6 +1,6 @@
 //Import the functions for fetching tmdb information
 import {fetchMovie, searchMovieByTitle, getMovieByTitle, fetchTrendingMovies, fetchTopRatedMovies,fetchTopRatedMoviesPage, getStreamingService} from './javaScriptFunctions/tmdbFetchFunctions.js';
-import{getStartPageMovies, getRecommendedMovies, searchYouTube} from './javaScriptFunctions/ApiCalls.js';
+import{getStartPageMovies, getRecommendedMovies, getCollaborativeRecommendedMovies, sendTimeSpentDataToServer, searchYouTube} from './javaScriptFunctions/ApiCalls.js';
 
 
 /************************************************************************************/
@@ -68,8 +68,6 @@ function addStarRating(rating, starsDiv){
 /************************************************************************************/
 //below are function for creating the youtube player 
 
-var allLikedMovies = [];  //array that contains the tmdb id of the movies for witch the trailer was watched
-
 //This function create a yotube video players and returns it
 //Its passed the divId wich corresponds to the identifier of the unique player div
 //Its also passed the youtube id of the youtube video we are creating the palyer for
@@ -94,21 +92,43 @@ async function createPlayer(divId ,youtubeId) {
 //This function enables the autoplay when a cursor enters the youtube player
 //It also adds to the list of watchedTrailers everytime cursor enters the youtube player
 //This function modifies the global allLikedMovies 
-function onPlayerReady(divId, event) {   
-    const player = event.target; //get the player itself 
-    const playerDiv = document.getElementById(`player${divId}`); //get the player div 
-    playerDiv.addEventListener('mouseenter', function () {  //when the mouse enters the div
-      player.playVideo(); // Start playing the video
-      /*************  here we assume that the divId is the tmdbId **************/
-      if (!allLikedMovies.includes(divId)) {  //if not already in the watched trailer array
-        allLikedMovies.push(divId);  // add it to the watched trailers
-      }
+var allLikedMovies = [];  //array that contains the tmdb id of the movies for witch the trailer was watched
+const timeSpentData = [];    
+
+
+function onPlayerReady(divId, event) {
+    const player = event.target; // Get the player itself
+    const playerDiv = document.getElementById(`player${divId}`); // Get the player div
+    let mouseEnterTime; // Variable to store the time when mouse enters the div
+
+    playerDiv.addEventListener('mouseenter', function () {
+        mouseEnterTime = new Date().getTime(); // Record the time when the mouse enters the div
+        player.playVideo(); // Start playing the video
+
+        /*************  here we assume that the divId is the tmdbId **************/
+        if (!allLikedMovies.includes(divId)) { // If not already in the watched trailer array
+            allLikedMovies.push(divId); // Add it to the watched trailers
+        }
+
     });
-    playerDiv.addEventListener('mouseleave', function () {  // when the mouse exits the div 
+
+    playerDiv.addEventListener('mouseleave', function () {
         player.pauseVideo(); // Pause the video when the mouse exits
+        if (mouseEnterTime) {   //check there is a valid time entered
+            const mouseExitTime = new Date().getTime(); // Get the time when the mouse exits the div
+            const timeSpentInDiv = mouseExitTime - mouseEnterTime; // Calculate the time spent in the div
+            const existingDataIndex = timeSpentData.findIndex(data => data.divId === divId); // Check if the divId already exists in timeSpentData
+            if (existingDataIndex !== -1) { // If divId already exists
+                timeSpentData[existingDataIndex].timeSpent += timeSpentInDiv; //accumulate the time spent
+            } else {  // If divId doesn't exist
+                timeSpentData.push({  //Add new entry
+                    divId: divId,
+                    timeSpent: timeSpentInDiv
+                });
+            }
+        }
     });
 }
-
 /************************************************************************************/
 
 
@@ -160,7 +180,8 @@ async function displayMoviesUsingTmdbIds(ids){
 /* Below are functions that cause the starting page and recommended movies functions to be called  */
 
 async function displayMoviesRecommended(){
-     let moviesRecommended = await getRecommendedMovies(allLikedMovies);  // get reccommended movies using the flask server
+    let moviesRecommended = await getCollaborativeRecommendedMovies(timeSpentData);
+     //let moviesRecommended = await getRecommendedMovies(allLikedMovies);  // get reccommended movies using the flask server
      await displayMoviesUsingTmdbIds(moviesRecommended); //display the recommended movies
 }
 
@@ -205,6 +226,10 @@ window.addEventListener("scroll", handleInfiniteScroll); //sroll event to handle
 
 
 
+
+window.addEventListener('beforeunload', function () {
+    sendTimeSpentDataToServer(timeSpentData);
+});
 
 
 
