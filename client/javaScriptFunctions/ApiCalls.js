@@ -60,22 +60,6 @@ export async function getCollaborativeRecommendedMovies(timeSpentData) {    //pa
     }
 }
 
-//This sends the time spent data to server
-export async function sendTimeSpentDataToServer(timeSpentData) {    //pass the it the array of liked movies and previously recommended movies
-    const apiUrl = `${domain}:5001/time_data`;   //the URL of the local api
-    try {   
-        return await fetch(apiUrl, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ timeSpentData }),
-        });
-        
-    } catch (error) {   //If an error occurs during the above process, return null
-        return null;
-    }
-}
 
 
 //This function sends a search query to a server

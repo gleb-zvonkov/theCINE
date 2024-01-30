@@ -47,16 +47,20 @@ def my_function():
 def collabritive_recommendations():
     data = request.get_json()
     timeSpentData = data.get("timeSpentData")
-    result = collabritive_mult_input_recommendations(timeSpentData, session['recommended_movie_tmdbids'])
-    session['recommended_movie_tmdbids'].extend(result)
-    session.modified = True
+    if timeSpentData:
+        result = collabritive_mult_input_recommendations(timeSpentData, session['recommended_movie_tmdbids'])
+        session['recommended_movie_tmdbids'].extend(result)
+        session.modified = True
+    else:
+        result = []
     return jsonify(result)
 
 @app.route('/time_data', methods=['POST'])  # Define a route for your API, which listens for POST requests at '/my_api'
 def time_data_function():
-    data = request.get_json() # Extract JSON data from the incoming request
-    timeSpentData = data.get("timeSpentData")
-    create_relationships(timeSpentData)
+    data = request.form.get('timeSpentData')
+    time_spent_data = json.loads(data)
+    if time_spent_data: 
+        create_relationships(time_spent_data)
     return make_response('', 200)
     
     

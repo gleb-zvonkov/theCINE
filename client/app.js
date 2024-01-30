@@ -1,6 +1,6 @@
 //Import the functions for fetching tmdb information
 import {fetchMovie, searchMovieByTitle, getMovieByTitle, fetchTrendingMovies, fetchTopRatedMovies,fetchTopRatedMoviesPage, getStreamingService} from './javaScriptFunctions/tmdbFetchFunctions.js';
-import{getStartPageMovies, getRecommendedMovies, getCollaborativeRecommendedMovies, sendTimeSpentDataToServer, searchYouTube} from './javaScriptFunctions/ApiCalls.js';
+import{getStartPageMovies, getRecommendedMovies, getCollaborativeRecommendedMovies, searchYouTube} from './javaScriptFunctions/ApiCalls.js';
 
 
 /************************************************************************************/
@@ -224,12 +224,18 @@ window.addEventListener("scroll", handleInfiniteScroll); //sroll event to handle
 /*****************************************************************************/
 
 
+function sendTimeSpentDataToServer() {
+    const apiUrl = 'http://127.0.0.1:5001/time_data'; // the URL of the local API
+    let data = new FormData();
+    data.append('timeSpentData', JSON.stringify(timeSpentData));
+    let beaconSent = navigator.sendBeacon(apiUrl, data);
+    if (beaconSent) {
+        timeSpentData = [];
+    } 
+}
 
-
-
-window.addEventListener('beforeunload', function () {
-    sendTimeSpentDataToServer(timeSpentData);
+document.addEventListener('visibilitychange', function () {
+    if (document.visibilityState === "hidden") {
+        sendTimeSpentDataToServer();
+    }
 });
-
-
-
