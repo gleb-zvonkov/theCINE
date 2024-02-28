@@ -67,14 +67,12 @@ def collabritive_mult_input_recommendations(time_spent_data, previosuly_recommen
     ids = [div_id for div_id, _ in ranked_recommendations]  # get just the ids 
     filtered_ids = [movie_id for movie_id in ids if movie_id not in previosuly_recommended_movie_ids] # remove any ids that already exist in the previosuly_recommended_movie_ids
 
-    print("got collabritive recommendations")
     return filtered_ids
     
     
 time_spent_data = [{'divId': 523607, 'timeSpent': 7645}, {'divId': 569094, 'timeSpent': 6059}, {'divId': 466420, 'timeSpent': 7747}, {'divId': 926393, 'timeSpent': 9397}, {'divId': 489, 'timeSpent': 186}, {'divId': 157336, 'timeSpent': 2513}, {'divId': 414906, 'timeSpent': 9417}, {'divId': 12445, 'timeSpent': 7756}, {'divId': 695721, 'timeSpent': 0}]
 previosuly_recommended_movie_ids = [523607]
 result = collabritive_mult_input_recommendations(time_spent_data, previosuly_recommended_movie_ids )
-print(result)
 
 
 # we need to write a flask server recommendation function 

@@ -42,23 +42,48 @@ export async function getRecommendedMovies(allLikedMovies) {    //pass the it th
     }
 }
 
-export async function getCollaborativeRecommendedMovies(timeSpentData) {    //pass the it the array of liked movies and previously recommended movies
+export async function getCollaborativeRecommendedMovies(timeSpentData, timeoutDuration = 30000) { // 10 seconds timeout by default
     const apiUrl = `${domain}:5001/collaborative_recommendations`;   //the URL of the local api
+    const controller = new AbortController();
+    const signal = controller.signal;
+
+    // Setup a timeout to abort the fetch request if it takes too long
+    const timeoutId = setTimeout(() => {
+        controller.abort();
+    }, timeoutDuration);
+
     try {   
-        const response = await fetch(apiUrl, {   //use fetch API 
-            method: 'POST',  //make a POST request
+        const response = await fetch(apiUrl, {
+            method: 'POST',
             headers: {
-                'Content-Type': 'application/json',   //the type of content is json
+                'Content-Type': 'application/json',
             },
             credentials: 'include',
-            body: JSON.stringify({timeSpentData}),  //make the request data a json
+            body: JSON.stringify({ timeSpentData }),
+            signal: signal // Pass the signal to the fetch request
         });
-        const data = await response.json(); // parse the json response, it is an array containing tmdb ids
-        return data; // return the data
-    } catch (error) {   //If an error occurs during the above process, return null
+
+        clearTimeout(timeoutId); // Clear the timeout since the request completed within the timeout duration
+
+        const data = await response.json();
+
+        //console.log('Received data:', data);
+
+        return data;
+    } catch (error) {
+        // Check if the error is due to the request being aborted
+        if (error.name === 'AbortError') {
+            console.log('Request timed out');
+            // Handle timeout error appropriately
+            // For example, display a message to the user indicating a timeout
+        } else {
+            // Handle other errors
+            console.error('Error occurred:', error);
+        }
         return null;
     }
 }
+
 
 
 

@@ -93,7 +93,7 @@ async function createPlayer(divId ,youtubeId) {
 //It also adds to the list of watchedTrailers everytime cursor enters the youtube player
 //This function modifies the global allLikedMovies 
 var allLikedMovies = [];  //array that contains the tmdb id of the movies for witch the trailer was watched
-const timeSpentData = [];    
+var timeSpentData = [];    
 
 
 function onPlayerReady(divId, event) {
