@@ -86,8 +86,8 @@ def neural_network_reccomendations(input_data, previosuly_recommended_movie_ids)
     combined_tuples = [(table.columns[i], result_row[i]) for i in range(len(table.columns))]   #combine the resulting row (time values) with the column names (movie ids) 
     sorted_tuples = sorted(combined_tuples, key=lambda x: x[1], reverse=True)   #sort them from greatest to smallest 
     ids = [tup[0] for tup in sorted_tuples]  #get just the movie ids from the sorted tuples 
-    filtered_ids = [movie_id for movie_id in ids if movie_id not in previosuly_recommended_movie_ids] # remove any previosuly recommended movies 
-    result = [int(x) for x in filtered_ids]
+    ids_integer = [int(x) for x in ids]
+    result = [movie_id for movie_id in ids_integer if movie_id not in previosuly_recommended_movie_ids] # remove any previosuly recommended movies 
     return result[:24] 
 
 
@@ -96,9 +96,9 @@ def neural_network_reccomendations(input_data, previosuly_recommended_movie_ids)
 
 #neural_netwrok_single_row(matrix)
 # input_data = [{'divId': 666277, 'timeSpent': 310},{'divId': 78769, 'timeSpent': 7483}, {'divId': 66278, 'timeSpent': 310}]
-# result = matrix_factorization_reccomendations(input_data, [])
+# result = neural_network_reccomendations(input_data, [78769])
 # print(len(result))
-# print(result)
+#print(result)
 
 
 # In[ ]:

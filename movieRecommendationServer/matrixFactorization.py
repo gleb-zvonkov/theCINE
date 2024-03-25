@@ -41,7 +41,7 @@ def matrix_factorization_single_row(R, K=2, row_index=None, steps=5000, alpha=0.
 
 
 def read_csv_as_table(file_path):
-    table = pd.read_csv(file_path)  #read in the entire table 
+    table = pd.read_csv(file_path, engine="python")  #read in the entire table 
     return table
 
 
@@ -56,8 +56,7 @@ def add_new_row(table, input_data):
     return table
 
 
-def matrix_factorization_reccomendations(input_data, previosuly_recommended_movie_ids):
-    SESSION_DATA_PATH = 'time_session_data.csv'    
+def matrix_factorization_reccomendations(input_data, previosuly_recommended_movie_ids):   
     table = read_csv_as_table(SESSION_DATA_PATH)  # read in the table from the csv file 
     table = add_new_row(table, input_data)  # add the new row to the table 
     M = table.values      #convert to NumPy array
@@ -66,9 +65,9 @@ def matrix_factorization_reccomendations(input_data, previosuly_recommended_movi
     combined_tuples = [(table.columns[i], result_row[i]) for i in range(len(table.columns))]   #combine the resulting row (time values) with the column names (movie ids) 
     sorted_tuples = sorted(combined_tuples, key=lambda x: x[1], reverse=True)   #sort them from greatest to smallest 
     ids = [tup[0] for tup in sorted_tuples]  #get just the movie ids from the sorted tuples 
-    filtered_ids = [movie_id for movie_id in ids if movie_id not in previosuly_recommended_movie_ids] # remove any previosuly recommended movies 
-    result = [int(x) for x in filtered_ids]
-    return result[:24] 
+    ids_integer = [int(x) for x in ids]
+    result = [movie_id for movie_id in ids_integer if movie_id not in previosuly_recommended_movie_ids] # remove any previosuly recommended movies 
+    return result[:24]  
 
 def write_to_csv(data):
     div_ids = [entry['divId'] for entry in data]          #get all the div_ids
@@ -118,8 +117,11 @@ def write_to_csv(data):
 
 
 
-input_data = [{'divId': 666277, 'timeSpent': 310},{'divId': 78769, 'timeSpent': 7483}, {'divId': 66278, 'timeSpent': 310}]
+#input_data = [{'divId': 666277, 'timeSpent': 310},{'divId': 78769, 'timeSpent': 7483}, {'divId': 66278, 'timeSpent': 310}]
 
-write_to_csv(input_data)
+#write_to_csv(input_data)
 
 
+# input_data = [{'divId': 666277, 'timeSpent': 310},{'divId': 78769, 'timeSpent': 7483}, {'divId': 66278, 'timeSpent': 310}]
+# result = matrix_factorization_reccomendations(input_data, [78769])
+# print(result)
