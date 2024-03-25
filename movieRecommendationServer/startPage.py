@@ -5,7 +5,6 @@
 import requests
 from bs4 import BeautifulSoup
 import re
-import requests
 import json
 import random
 from tmdbFetchFunctions import fetch_trending_movies, fetch_top_rated_movies, getMoviesUsingTitles 
@@ -107,7 +106,7 @@ def get_random_strings(string_array, num_strings):
 top_rated_movies_info = []
 popular_movies_info = []
 
-def all_movies_info():    #2 minutes
+def all_movies_info():    #2 minutes       
     global top_rated_movies_info 
     global popular_movies_info 
     top_rated_movies = common_strings(get_top_rated_movie_names(),scrape_imdb_top())    # get the movies common to the top rated movies from tmdb and imdb 

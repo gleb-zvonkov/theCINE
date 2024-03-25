@@ -2,12 +2,12 @@ import csv
 import requests
 import json
 from tmdbFetchFunctions import fetchMovieById, getMovieCrewById 
+from config import MOVIE_DATA_PATH
 
 #this function adds a movie to the CSV
 #it fetches movie data and crew data
 #rearanges it into the proper format 
 #writes it to a csv
-csv_file_path = '45000_movies/movies_metadata_final_added.csv'
 tmdb_ids_in_csv = set() #built-in data type that represents an unordered collection of unique elements
 
 
@@ -38,7 +38,7 @@ def getMovieInfoForCSV(tmdbId):
 # does not check if it already exists
 def addMovieToCSV(tmdbId):
     new_data = getMovieInfoForCSV(tmdbId) 
-    with open(csv_file_path, 'a', newline='') as file:   # open the csv
+    with open(MOVIE_DATA_PATH, 'a', newline='') as file:   # open the csv
         csv_writer = csv.writer(file)  #csv writer object 
         csv_writer.writerow(new_data)  #write the data
         print(f"Data for tmdbId {tmdbId} added to the CSV.") # print a statment indicating its been added 
@@ -49,7 +49,7 @@ def addMovieToCSV(tmdbId):
 def findMoviesInCSV():
     global tmdb_ids_in_csv
     try:
-        with open(csv_file_path, 'r', newline='') as csvfile:  # open csv file 
+        with open(MOVIE_DATA_PATH, 'r', newline='') as csvfile:  # open csv file 
             csv_reader = csv.reader(csvfile)   # create a csv reader object 
             next(csv_reader)  # Skip the header row
             for row in csv_reader:

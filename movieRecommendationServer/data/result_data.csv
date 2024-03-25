@@ -1,0 +1,6 @@
+type,default,graphBased,kmeans,matrixFactorization,knn,defaultY,hybrid,neuralNetwork
+watchtime,559,81,199,194,181,24,125,124
+screenClick,22,2,6,8,2,0,4,3
+youtubeClick,0,0,0,0,0,0,0,0
+googleClick,2,1,0,14,0,0,0,0
+streamingClick,3,0,0,0,0,0,0,0
