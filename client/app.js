@@ -41,7 +41,9 @@ async function createMovieDiv(movieData, divId){
         movieListItem.innerHTML =`
             <div class = "movie-item-container">
                 <div class = "movie-item">
-                     <img class= "backdrop_image" src = "https://image.tmdb.org/t/p/original/${movieData.backdrop_path}">   
+                     
+                    <img class="backdrop_image" src="${movieData.backdrop_path ? `https://image.tmdb.org/t/p/original/${movieData.backdrop_path}` : 'otherImages/default.jpg'}"> 
+                     
                      <h1 class="title">${movieData.title} </h1>
                      <h2 class="stars">  </h2>
 
@@ -225,6 +227,11 @@ function onPlayerReady(divId, event) {
             }
         } //end if
     });
+
+    document.addEventListener("mouseleave", function() {  //if user leaves the tab, pause the video
+        player.pauseVideo();
+    });
+
 
     videoOverlay.addEventListener('click', function(event) { //when video is clicked we make it full screen
         if (firstClick) {    //if its the first time its clicked

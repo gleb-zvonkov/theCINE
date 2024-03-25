@@ -1,4 +1,5 @@
-const domain = 'http://127.0.0.1';    //this is what needs to be changed when running locally vs on google engine machine
+//const domain = 'http://127.0.0.1';    //this is what needs to be changed when running locally vs on google engine machine
+const domain = 'http://' + window.location.hostname;
 
 //this function get movie name for the starting page using the python flask server
 //GET requests are generally considered idempotent (repeating the same request multiple times has the same effect as making the request once)
