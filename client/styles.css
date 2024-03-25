@@ -1,10 +1,40 @@
+
+.button-container {
+    display: flex;
+}
+
+button {
+    flex-grow: 1;
+    margin: 10px 11px;
+    height: 40px;
+    border-radius: 30px;
+    background-color: rgba(0, 0, 0, 0.2);
+    border: none;
+    font-size: 150%;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1), inset 0 -3px 3px rgba(0, 0, 0, 0.1); 
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: rgb(200, 12, 12);
+    background-image: radial-gradient(circle, rgba(255, 255, 255, 0.3), rgba(0, 0, 0, 0.3));
+    transform: scale(1.05);
+}
+
+
+button.clicked {
+    background: rgb(200, 12, 12);
+    transform: scale(1.05);
+}
+
+
 .result-grid{   /* The grid that contains all the movies */
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(600px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(700px, 1fr));
     /* grid will automatically adjust the number of columns based on the available width
      a minimum column width of 200px 
      each column taking up an equal fraction of the available space (1fr) */
-     gap: 15px;  /*Put a gap between each search item*/
+     gap: 19px;  /*Put a gap between each search item*/
 }
 
 .movie-item-container{   /*A container for each movie*/
@@ -37,34 +67,71 @@
 
 .stars{
     position: absolute;
-    bottom: 30px; /* Adjust as needed */
-    left: 15px; /* Adjust as needed */
-    color: white;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
-}
-
-.provider {
-    position: absolute;
-    bottom: -10px; /* Adjust as needed */
+    bottom: -3px; /* Adjust as needed */
     right: 15px; /* Adjust as needed */
     color: white;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
 }
 
-.provider-image {
+ /* .provider {
     position: absolute;
-    bottom: 15px;
-    right: 10px;
-    max-width: 130px; /* Ensure the image does not exceed the container width */
+    bottom: -10px; 
+    right: 15px; 
+    color: white;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+}  */
+
+.google-link {
+    position: absolute;
+    bottom: 8px;
+    right: 137px;
+    max-width: 100px; /* Ensure the image does not exceed the container width */
+    opacity:0;
+    z-index: 2; 
 }
 
-.justWatchLogo{
+.provider-image {
     position: absolute;
-    bottom: 60px;
-    right: 10px;
-    max-width: 80px;
-    opacity: 0.3;
+    bottom: 8px;
+    right: 250px;
+    max-width: 130px; /* Ensure the image does not exceed the container width */
+    opacity:0;
+    z-index: 2; 
 }
+
+.youtube-link{
+    position: absolute;
+    bottom: 3px;
+    right: 3px;
+    max-width: 135px;
+    opacity:0;
+    z-index: 2;
+    pointer-events: none;
+}
+
+.full-screen{
+    position: absolute;
+    bottom: 3px;
+    right: 380px;
+    max-width: 135px;
+    opacity:1;
+    z-index: 2;
+    pointer-events: none;
+    color:red;
+    background-color: red;
+}
+
+.mouse-move{
+    position: absolute;
+    bottom: 5px;
+    top: 5px;
+    width:100%;
+    height:80%;
+    /* background-color:rgba(0, 0, 255, 0.5);  */
+    z-index: 3;
+    
+}
+
 
 .hover-video {  /*The video for each movie*/
     width: 100%;  /* Match the width of the parent .search-item */
@@ -74,15 +141,42 @@
     top: 0;    /*distance between the top edge absolute position*/
     left: 0;   /*distance between the left edge absolute position*/
     opacity: 0;  /*set the opacity to 0, so the video does not appear*/
-    transition: opacity 2s ease;  /*set the opacity transition to 2 seconds*/
+    transition: opacity 4s ease, transform 2s ease;
+    
 }
 
 .movie-item:hover .hover-video{      /*apply styles to the hoover video when the movie item is hovered over*/  
     opacity: 1;   /*when the search item is hovered over set the videos opacity to 1 so its visible */
+    z-index: 1;
+    transform: scale(1.02); /* Adjust scale and translate to center */
 }
 
-.movie-item:hover{   /* */
-    transform: scale(1.05);  /*when the search item is hover over scale its size up*/
+ .movie-item:hover{
+    transform: scale(1.02);
+    z-index: 1;
+} 
+
+
+.movie-item:hover .provider-image {
+    opacity: 1;
+    /* animation: fadeOut 4.5s forwards;  */
 }
 
+ .movie-item:hover .google-link {
+    opacity: 1;
+    /* animation: fadeOut 4.5s forwards;  */
+}
+
+.movie-item:hover .youtube-link {
+    opacity: 1;
+    /* animation: fadeOut 4.5s forwards;  */
+}
+
+
+
+/*
+@keyframes fadeOut {
+    60% { opacity: 1; }
+    100% { opacity: 0; }
+} */
 

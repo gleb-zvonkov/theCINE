@@ -90,38 +90,36 @@ export async function fetchTopRatedMoviesPage(page){
 }
 
 
-
 export async function getStreamingService(tmdbId) {
-const url = `https://api.themoviedb.org/3/movie/${tmdbId}/watch/providers`;
-const headers = {
-    "Accept": "application/json",
-    "Authorization": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIzZDIwYzY4ZDMxNmRkMjM0NGVkOWI5ZjRmNDNkMzIyYiIsInN1YiI6IjY1MDc1ODFhM2NkMTJjMDE0ZWJmN2U2YiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.URBinN5yI5YymjjRmdSmr4nEHXkQfsMFqToTyv9QTt0"
-};
+  const url = `https://api.themoviedb.org/3/movie/${tmdbId}/watch/providers`;
+  const headers = {
+      "Accept": "application/json",
+      "Authorization": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIzZDIwYzY4ZDMxNmRkMjM0NGVkOWI5ZjRmNDNkMzIyYiIsInN1YiI6IjY1MDc1ODFhM2NkMTJjMDE0ZWJmN2U2YiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.URBinN5yI5YymjjRmdSmr4nEHXkQfsMFqToTyv9QTt0"
+  };
 
-try {
-    const response = await fetch(url, {
-        method: 'GET',
-        headers: headers,
-    });
+  try {
+      const response = await fetch(url, {
+          method: 'GET',
+          headers: headers,
+      });
 
-    if (response.ok) {
-        const data = await response.json();
+      if (response.ok) {
+          const data = await response.json();
 
-        if ('CA' in data.results) {
-            const caData = data.results.CA;
+          if ('CA' in data.results) {
+              const caData = data.results.CA;
 
-            if (caData.flatrate && caData.flatrate.length > 0) {
-                const firstFlatrateResult = caData.flatrate[0];
-                const providerName = firstFlatrateResult.provider_name;
-                return providerName;
-            }
-        }
-    } else {
-        console.error(`Failed to retrieve data. Status Code: ${response.status}`);
-    }
-} catch (error) {
-    console.error(`Error during fetch: ${error.message}`);
-}
-
-return null;
+              if (caData.flatrate && caData.flatrate.length > 0) {
+                  const firstFlatrateResult = caData.flatrate[0];
+                  const providerName = firstFlatrateResult.provider_name;
+                  return providerName;
+              }
+          }
+      } else {
+          console.error(`Failed to retrieve data. Status Code: ${response.status}`);
+      }
+  } catch (error) {
+      console.error(`Error during fetch: ${error.message}`);
+  }
+  return null;
 }

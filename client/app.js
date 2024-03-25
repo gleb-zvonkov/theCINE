@@ -1,11 +1,34 @@
 //Import the functions for fetching tmdb information
 import {fetchMovie, searchMovieByTitle, getMovieByTitle, fetchTrendingMovies, fetchTopRatedMovies,fetchTopRatedMoviesPage, getStreamingService} from './javaScriptFunctions/tmdbFetchFunctions.js';
-import{getStartPageMovies, getRecommendedMovies, getCollaborativeRecommendedMovies, searchYouTube} from './javaScriptFunctions/ApiCalls.js';
+import{getStartPageMovies, searchYouTube, getRecommendedMoviesViaMethod, sendTimeSpentDataToServer} from './javaScriptFunctions/ApiCalls.js';
+
+
+/************************************************************************************/
+//below is the function for keeping track of the mdoel selected
+
+var clickedButton;
+document.addEventListener('DOMContentLoaded', function() {
+    var buttons = document.querySelectorAll('button');
+    buttons.forEach(function(button) {
+        button.addEventListener('click', function() {
+            // Remove 'clicked' class from all buttons
+            buttons.forEach(function(btn) {
+                btn.classList.remove('clicked');
+            });
+            // Add 'clicked' class to the clicked button
+            this.classList.add('clicked');
+
+            clickedButton = this;
+        });
+    });
+});
+
+/************************************************************************************/
+
 
 
 /************************************************************************************/
 //below are function for creating the div with backdrop image, title, star rating 
-
 
 //This functions creates one movie item 
 //The arguments are the movie data since it need the backdrop path
@@ -13,16 +36,30 @@ import{getStartPageMovies, getRecommendedMovies, getCollaborativeRecommendedMovi
 async function createMovieDiv(movieData, divId){
         const resultGrid = document.getElementById('result-grid');  //get the grid
         let movieListItem = document.createElement('div'); //for each movie list create a div
-        const providerImageUrl = await getSteamingServiceImage(movieData.id);
+        const providerData = await getStreamingServiceImage(movieData.id);
+
         movieListItem.innerHTML =`
             <div class = "movie-item-container">
                 <div class = "movie-item">
                      <img class= "backdrop_image" src = "https://image.tmdb.org/t/p/original/${movieData.backdrop_path}">   
                      <h1 class="title">${movieData.title} </h1>
                      <h2 class="stars">  </h2>
-                     ${providerImageUrl ? `<img class="provider-image" src="${providerImageUrl}" >` : ''}  
-                     ${providerImageUrl ? `<img class="justWatchLogo" src="StreamingServiceLogos/JustWatch-logo-large.png" alt="Logo">` : ''}
-                     <div class = "hover-video" id="player${divId}"></div>     
+
+
+                     <div class = "links" id="link${divId}">
+                        <a href="https://www.google.com/search?q=${movieData.title} ${movieData.release_date.substring(0, 4)}" target="_blank"> 
+                            <img class="google-link" src="otherImages/google-white-logo.png" >
+                        </a>
+                        <a href="${providerData.websiteUrl}" target="_blank">
+                            ${providerData.imageUrl ? `<img class="provider-image" src="${providerData.imageUrl}" >` : ''}  
+                        </a>
+                        <img class="youtube-link" src="otherImages/youtube.png" >
+                     </div>
+
+                     
+                     <div class = "hover-video" id="player${divId}"></div>  
+                    <div class ="mouse-move" id="mouse${divId}"> </div> 
+                      
                 </div>
             </div> `;
       
@@ -30,21 +67,43 @@ async function createMovieDiv(movieData, divId){
         resultGrid.appendChild(movieListItem); //add it to the grid
 }
 
-//This function intakes a tmdbid for a movie
-// It returns a url to the streaming service image where that movie is available
-async function getSteamingServiceImage(tmdbid){
+
+async function getStreamingServiceImage(tmdbid) {
     const providerName = await getStreamingService(tmdbid);
-    const providerImageMap = {     // Mapping between provider names and image URLs
-    'Netflix': 'StreamingServiceLogos/netflix.png',
-    'Crave': 'StreamingServiceLogos/crave.png',
-    'Amazon Prime Video': 'StreamingServiceLogos/prime.png',
-    'Disney Plus': 'StreamingServiceLogos/disney.png',
-    'Criterion Channel': 'StreamingServiceLogos/criterion.png',
-    'Apple TV Plus': 'StreamingServiceLogos/apple.png',
-    'Paramount Plus': 'StreamingServiceLogos/paramount.png'};
-    const providerImageUrl = providerImageMap[providerName] || '';
-    return providerImageUrl;
+    const providerImageMap = {
+        'Netflix': {
+            imageUrl: 'StreamingServiceLogos/netflix.png',
+            websiteUrl: 'https://www.netflix.com/'
+        },
+        'Crave': {
+            imageUrl: 'StreamingServiceLogos/crave.png',
+            websiteUrl: 'https://www.crave.ca/'
+        },
+        'Amazon Prime Video': {
+            imageUrl: 'StreamingServiceLogos/prime.png',
+            websiteUrl: 'https://www.primevideo.com/'
+        },
+        'Disney Plus': {
+            imageUrl: 'StreamingServiceLogos/disney.png',
+            websiteUrl: 'https://www.disneyplus.com/'
+        },
+        'Criterion Channel': {
+            imageUrl: 'StreamingServiceLogos/criterion.png',
+            websiteUrl: 'https://www.criterionchannel.com/'
+        },
+        'Apple TV Plus': {
+            imageUrl: 'StreamingServiceLogos/apple.png',
+            websiteUrl: 'https://tv.apple.com/'
+        },
+        'Paramount Plus': {
+            imageUrl: 'StreamingServiceLogos/paramount.png',
+            websiteUrl: 'https://www.paramountplus.com/'
+        }
+    };
+    const providerData = providerImageMap[providerName] || { imageUrl: '', websiteUrl: '' };
+    return providerData;
 }
+
 
 //This function adds intakes a rating and a div
 //From the rating it creates a number of star and places them on the div
@@ -92,28 +151,66 @@ async function createPlayer(divId ,youtubeId) {
 //This function enables the autoplay when a cursor enters the youtube player
 //It also adds to the list of watchedTrailers everytime cursor enters the youtube player
 //This function modifies the global allLikedMovies 
+let screenClick = 0;
+let youtubeClick =0;
+let googleClick = 0;
+let streamingClick = 0;
 var allLikedMovies = [];  //array that contains the tmdb id of the movies for witch the trailer was watched
-var timeSpentData = [];    
+var timeSpentData = []; 
+var firstClick = true;
 
+function isDescendant(parent, child) {
+    let node = child.parentNode;
+    while (node != null) {
+        if (node === parent) {
+            return true;
+        }
+        node = node.parentNode;
+    }
+    return false;
+}
+
+
+const hideElement = (element) => {
+    element.style.display = 'none';
+};
+
+const showElementWithDelay = (element, delay) => {
+    element.style.display = 'block';
+    clearTimeout(element.timeoutId);
+    element.timeoutId = setTimeout(() => hideElement(element), delay);
+};
 
 function onPlayerReady(divId, event) {
+    const delayTime = 3500;
+    let timeoutId;
+    let mouseEnterTime; // Variable to store the time when mouse enters the div
     const player = event.target; // Get the player itself
     const playerDiv = document.getElementById(`player${divId}`); // Get the player div
-    let mouseEnterTime; // Variable to store the time when mouse enters the div
+    const container = playerDiv.parentNode;  //The container of the iframe
+    const videoOverlay= document.getElementById(`mouse${divId}`);
+    const linksDiv = document.getElementById(`link${divId}`);
+    const googleLink = linksDiv.querySelector('.google-link');
+    const providerImage = linksDiv.querySelector('.provider-image');
+    const youtubeLink = linksDiv.querySelector('.youtube-link');
 
-    playerDiv.addEventListener('mouseenter', function () {
+    googleLink.addEventListener('click', () => { googleClick++; });
+    providerImage?.addEventListener('click', () => streamingClick++);
+    youtubeLink.addEventListener('click', () => {youtubeClick++;});
+
+    videoOverlay.addEventListener('mouseenter', function () {
+        showElementWithDelay(linksDiv, delayTime);
         mouseEnterTime = new Date().getTime(); // Record the time when the mouse enters the div
         player.playVideo(); // Start playing the video
-
-        /*************  here we assume that the divId is the tmdbId **************/
         if (!allLikedMovies.includes(divId)) { // If not already in the watched trailer array
             allLikedMovies.push(divId); // Add it to the watched trailers
         }
-
     });
 
-    playerDiv.addEventListener('mouseleave', function () {
-        player.pauseVideo(); // Pause the video when the mouse exits
+    container.addEventListener('mouseleave', function (event) {
+        if (event.relatedTarget && !isDescendant(container, event.relatedTarget)) {  //only if its not in the container
+        player.pauseVideo(); // Pause the video when the mouse exits   
+        }
         if (mouseEnterTime) {   //check there is a valid time entered
             const mouseExitTime = new Date().getTime(); // Get the time when the mouse exits the div
             const timeSpentInDiv = mouseExitTime - mouseEnterTime; // Calculate the time spent in the div
@@ -126,8 +223,27 @@ function onPlayerReady(divId, event) {
                     timeSpent: timeSpentInDiv
                 });
             }
-        }
+        } //end if
     });
+
+    videoOverlay.addEventListener('click', function(event) { //when video is clicked we make it full screen
+        if (firstClick) {    //if its the first time its clicked
+            player.playVideo();  //play the video 
+            firstClick = false; // Set firstClick to false after the first click
+        } else{
+            var requestFullScreen = playerDiv.requestFullScreen || playerDiv.mozRequestFullScreen || playerDiv.webkitRequestFullScreen; //get full screen 
+            if (requestFullScreen) {  //if avaible 
+                playerDiv.style.cssText = '';  //remove all the css 
+                requestFullScreen.bind(playerDiv)(); //bind it 
+            }
+        }
+        screenClick++; //increment the screen clock
+    });
+
+    container.addEventListener('mousemove', function (event) {  //when the mouse moves we show the link
+        showElementWithDelay(linksDiv, delayTime);
+    });
+
 }
 /************************************************************************************/
 
@@ -180,8 +296,13 @@ async function displayMoviesUsingTmdbIds(ids){
 /* Below are functions that cause the starting page and recommended movies functions to be called  */
 
 async function displayMoviesRecommended(){
-    let moviesRecommended = await getCollaborativeRecommendedMovies(timeSpentData);
-     //let moviesRecommended = await getRecommendedMovies(allLikedMovies);  // get reccommended movies using the flask server
+
+    let method = "graphBased"; // Default method
+    if (clickedButton && clickedButton.id !== undefined) {
+        method = clickedButton.id;
+    }
+
+    let moviesRecommended = await getRecommendedMoviesViaMethod(timeSpentData, method);   
      await displayMoviesUsingTmdbIds(moviesRecommended); //display the recommended movies
 }
 
@@ -224,18 +345,23 @@ window.addEventListener("scroll", handleInfiniteScroll); //sroll event to handle
 /*****************************************************************************/
 
 
-function sendTimeSpentDataToServer() {
-    const apiUrl = 'http://127.0.0.1:5001/time_data'; // the URL of the local API
-    let data = new FormData();
-    data.append('timeSpentData', JSON.stringify(timeSpentData));
-    let beaconSent = navigator.sendBeacon(apiUrl, data);
-    if (beaconSent) {
-        timeSpentData = [];
-    } 
-}
 
+
+/*****************************************************************************/
+/* Below are functions that cause the analytic data to be sent   */
+
+//send time data when user leaves website 
+// https://developer.mozilla.org/en-US/docs/Web/API/Navigator/sendBeacon
 document.addEventListener('visibilitychange', function () {
     if (document.visibilityState === "hidden") {
-        sendTimeSpentDataToServer();
+        sendTimeSpentDataToServer(clickedButton, timeSpentData, screenClick, youtubeClick, googleClick, streamingClick)
     }
 });
+
+/*****************************************************************************/
+
+
+
+
+
+

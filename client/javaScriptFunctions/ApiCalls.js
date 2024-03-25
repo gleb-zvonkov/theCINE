@@ -20,38 +20,14 @@ export async function getStartPageMovies() {    //pass the it the array of liked
     }
 }
 
-//This function gets recommende movies using the python flask server
-export async function getRecommendedMovies(allLikedMovies) {    //pass the it the array of liked movies and previously recommended movies
-    const apiUrl = `${domain}:5001/recommendations`;   //the URL of the local api
-    try {   
-        const requestData = {   //create the request data that contains the two arrays
-            allLikedMovies: allLikedMovies
-        };
-        const response = await fetch(apiUrl, {   //use fetch API 
-            method: 'POST',  //make a POST request
-            headers: {
-                'Content-Type': 'application/json',   //the type of content is json
-            },
-            credentials: 'include',
-            body: JSON.stringify(requestData),  //make the request data a json
-        });
-        const data = await response.json(); // parse the json response, it is an array containing tmdb ids
-        return data; // return the data
-    } catch (error) {   //If an error occurs during the above process, return null
-        return null;
-    }
-}
 
-export async function getCollaborativeRecommendedMovies(timeSpentData, timeoutDuration = 30000) { // 10 seconds timeout by default
-    const apiUrl = `${domain}:5001/collaborative_recommendations`;   //the URL of the local api
+export async function getRecommendedMoviesViaMethod(timeSpentData, method, timeoutDuration = 30000) { 
+    const apiUrl = `${domain}:5001/${method}`;   //method names
     const controller = new AbortController();
     const signal = controller.signal;
-
-    // Setup a timeout to abort the fetch request if it takes too long
-    const timeoutId = setTimeout(() => {
+    const timeoutId = setTimeout(() => {  // Setup a timeout to abort the fetch request if it takes too long
         controller.abort();
     }, timeoutDuration);
-
     try {   
         const response = await fetch(apiUrl, {
             method: 'POST',
@@ -62,29 +38,14 @@ export async function getCollaborativeRecommendedMovies(timeSpentData, timeoutDu
             body: JSON.stringify({ timeSpentData }),
             signal: signal // Pass the signal to the fetch request
         });
-
         clearTimeout(timeoutId); // Clear the timeout since the request completed within the timeout duration
-
         const data = await response.json();
-
-        //console.log('Received data:', data);
-
         return data;
     } catch (error) {
-        // Check if the error is due to the request being aborted
-        if (error.name === 'AbortError') {
-            console.log('Request timed out');
-            // Handle timeout error appropriately
-            // For example, display a message to the user indicating a timeout
-        } else {
-            // Handle other errors
-            console.error('Error occurred:', error);
-        }
+        console.error('Error occurred:', error);
         return null;
     }
 }
-
-
 
 
 //This function sends a search query to a server
@@ -97,4 +58,27 @@ export async function searchYouTube(serchQuery){  //search for the movie trailer
      } catch (error) {
         return null;
     }
+}
+
+
+export function sendTimeSpentDataToServer(clickedButton, timeSpentData, screenClick, youtubeClick, googleClick, streamingClick) {
+    const apiUrl = `${domain}:5001/time_data`; // the URL of the local API
+    let data = new FormData();   //used to construct a set of key/value pairs
+    let method = clickedButton ? clickedButton.id : "default";   //if button is not clicked make it default
+
+    data.append('recommendationMethod', JSON.stringify(method));
+
+    data.append('timeSpentData', JSON.stringify(timeSpentData));
+
+    data.append('clickData', JSON.stringify({
+        screenClick,
+        youtubeClick,
+        googleClick,
+        streamingClick
+    }));
+
+    let beaconSent = navigator.sendBeacon(apiUrl, data);
+    if (beaconSent) {
+        timeSpentData = [];
+    } 
 }
