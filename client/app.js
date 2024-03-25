@@ -225,7 +225,7 @@ window.addEventListener("scroll", handleInfiniteScroll); //sroll event to handle
 
 
 function sendTimeSpentDataToServer() {
-    const apiUrl = 'http://127.0.0.1:5001/time_data'; // the URL of the local API
+    const apiUrl = 'http://35.226.51.35:5001/time_data'; // the URL of the local API
     let data = new FormData();
     data.append('timeSpentData', JSON.stringify(timeSpentData));
     let beaconSent = navigator.sendBeacon(apiUrl, data);
