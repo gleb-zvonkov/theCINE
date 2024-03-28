@@ -56,7 +56,10 @@ def create_model(input_shape):
 
 
 X_train = np.argwhere(~np.isnan(matrix))  #indices of non-NaN elements in the matrix
+print(X_train)
 y_train = matrix[~np.isnan(matrix)].reshape(-1, 1) #column vector containing the non-NaN values from the original matrix
+print(y_train)
+
 model = create_model(input_shape=(2,))
 model.fit(X_train, y_train, epochs=50, batch_size=16, verbose=0)
 

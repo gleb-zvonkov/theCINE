@@ -232,6 +232,9 @@ function onPlayerReady(divId, event) {
         player.pauseVideo();
     });
 
+    document.addEventListener("visibilitychange", function() {
+        player.pauseVideo();
+    });
 
     videoOverlay.addEventListener('click', function(event) { //when video is clicked we make it full screen
         if (firstClick) {    //if its the first time its clicked

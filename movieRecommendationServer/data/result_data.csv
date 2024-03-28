@@ -1,6 +1,10 @@
-type,default,graphBased,kmeans,matrixFactorization,knn,defaultY,hybrid,neuralNetwork
-watchtime,951,81,199,406,228,24,125,270
-screenClick,31,2,6,10,4,0,4,3
-youtubeClick,0,0,0,0,0,0,0,0
-googleClick,2,1,0,14,0,0,0,0
-streamingClick,3,0,0,0,0,0,0,0
+type,default,graphBased,kmeans,matrixFactorization,knn,hybrid,neuralNetwork
+sessions,22,10,14,12,14,10,10
+watchtime,15503,1387,7663,24071,2157,1258,1964
+averageWatchtime,2214,277,1526,4814,425,251,392
+screenClick,218,15,35,51,4,39,81
+youtubeClick,0,0,0,0,0,0,0
+googleClick,181,8,1,22,2,12,0
+streamingClick,10,2,1,6,0,2,2
+totalClicks,409,25,37,79,6,53,83
+averageClicks,58,5,7,15,1,10,16

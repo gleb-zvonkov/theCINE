@@ -17,7 +17,7 @@ import os # used to generate secret key
 from flask import make_response
 from graphBased import create_relationships, collabritive_mult_input_recommendations
 from matrixFactorization import matrix_factorization_reccomendations, write_to_csv
-from timeDataStorage import record_time_data, record_click_data
+from timeDataStorage import record_time_data, record_click_data, record_method_data
 import random
 from neuralNetwork import neural_network_reccomendations
 # from config import MOVIE_DATA_PATH, RESULT_DATA_PATH, SESSION_DATA_PATH
@@ -132,6 +132,7 @@ def time_data_function():
         write_to_csv(time_spent_data)   # for matrix factorization
         record_time_data(time_spent_data, method)
         record_click_data(click_data, method)
+        record_method_data(time_spent_data, click_data, method)
         # for general storage 
 
     return make_response('', 200)
